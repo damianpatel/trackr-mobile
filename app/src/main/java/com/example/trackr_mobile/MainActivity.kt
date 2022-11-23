@@ -41,7 +41,6 @@ class MainActivity : ComponentActivity() {
                     // Top title bar
                     TitleBar(title = "TrackR")
                     // Dropdown of user's sheets
-                    AuthPage()
                     DisplaySheets()
                 }
             }
