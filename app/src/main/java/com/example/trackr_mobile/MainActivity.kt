@@ -41,12 +41,22 @@ class MainActivity : ComponentActivity() {
                     // Top title bar
                     TitleBar(title = "TrackR")
                     // Dropdown of user's sheets
+                    AuthPage()
                     DisplaySheets()
                 }
             }
         }
     }
 }
+
+@Composable
+fun AuthPage() {
+    Button(onClick = { println("Button pressed") }) {
+        Text(text = "Sign in with Google")
+    }
+
+}
+
 
 @Composable
 fun TitleBar(title: String) {
@@ -81,35 +91,44 @@ fun DisplaySheets() {
         Icons.Filled.ArrowDropDown
     }
 
-    Column(Modifier.padding(20.dp)) {
-        OutlinedTextField(value = selectedText, onValueChange = { selectedText = it },
-            modifier = Modifier
-                .clickable { expanded = !expanded }
-                .fillMaxWidth()
-                .onGloballyPositioned { coordinates ->
-                    textFieldSize = coordinates.size.toSize()
-                },
-            label = { Text("YouR Sheets") },
-            trailingIcon = {
-                Icon(arrowIcon, "contentDescription", Modifier.clickable { expanded = !expanded })
-            },
-            enabled = false,
-        )
 
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.width(with(LocalDensity.current) { textFieldSize.width.toDp() })
-        ) {
-            sheets.forEach { sheet ->
-                DropdownMenuItem(onClick = {
-                    selectedText = sheet
-                    expanded = false
-                }) {
-                    Text(text = sheet)
+
+    Column(Modifier.padding(20.dp)) {
+
+        Box {
+            OutlinedTextField(value = selectedText, onValueChange = { selectedText = it },
+                modifier = Modifier
+                    .clickable { expanded = !expanded }
+                    .fillMaxWidth()
+                    .onGloballyPositioned { coordinates ->
+                        textFieldSize = coordinates.size.toSize()
+                    },
+                label = { Text("YouR Sheets") },
+                trailingIcon = {
+                    Icon(arrowIcon, "contentDescription", Modifier.clickable { expanded = !expanded })
+                },
+                enabled = false,
+            )
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.width(with(LocalDensity.current) { textFieldSize.width.toDp() })
+            ) {
+                sheets.forEach { sheet ->
+                    DropdownMenuItem(onClick = {
+                        selectedText = sheet
+                        expanded = false
+                    }) {
+                        Text(text = sheet)
+                    }
                 }
             }
+
+
         }
+
+
+
         // Status of selected sheet
         println(entries)
         DisplayStatus(entries)
