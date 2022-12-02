@@ -20,12 +20,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
-import androidx.navigation.NavController
+import com.example.trackr_mobile.model.User
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(userEmail: String, displayName: String) {
     TitleBar("TrackR")
     DisplaySheets()
+
+    Text(text = "Welcome $displayName! Your email is $userEmail", modifier = Modifier.offset(x = 20.dp, y = 600.dp))
 }
 
 @Composable
@@ -33,6 +35,7 @@ fun TitleBar(title: String) {
     TopAppBar(title = {
         Text(text = title, textAlign = TextAlign.Center)
     })
+    Spacer(modifier = Modifier.padding(30.dp))
 }
 
 @Composable

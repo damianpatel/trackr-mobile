@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "623088515936",
+    "project_id": "trackr-mobile",
+    "storage_bucket": "trackr-mobile.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:623088515936:android:0a966b7fe94da9308d3c05",
+        "android_client_info": {
+          "package_name": "com.example.trackr_mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "623088515936-cou3e6aj2s2sg8pbbricnpmldbu768k9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfzujfyRUd-0o1Vg7KCrgqBze0elm7rm4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "623088515936-cou3e6aj2s2sg8pbbricnpmldbu768k9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

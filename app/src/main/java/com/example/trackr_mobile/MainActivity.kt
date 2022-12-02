@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.trackr_mobile.ui.AuthPage
+import com.example.trackr_mobile.ui.AuthScreen
 import com.example.trackr_mobile.ui.HomeScreen
 import com.example.trackr_mobile.ui.Screen
 import com.example.trackr_mobile.ui.theme.TrackrmobileTheme
@@ -24,14 +25,22 @@ class MainActivity : ComponentActivity() {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxSize(),
                 ) {
+                    //AuthScreen()
+
                     val navController = rememberNavController()
 
                     NavHost(navController = navController, startDestination = Screen.LOGIN.route ) {
                         composable(Screen.LOGIN.route) {
-                            AuthPage(navController)
+                            AuthScreen(navController = navController)
                         }
-                        composable(Screen.HOME.route) {
-                            HomeScreen(navController)
+                        composable("${Screen.HOME.route}/{email}/{displayName}") {
+                            val email = it.arguments?.getString("email")
+                            val displayName = it.arguments?.getString("displayName")
+
+
+                            if (email != null && displayName != null) {
+                                HomeScreen(email, displayName)
+                            }
                         }
                     }
                 }
