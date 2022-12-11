@@ -1,6 +1,8 @@
 package com.example.trackr_mobile.ui
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -21,31 +23,49 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
+import com.example.trackr_mobile.model.Application
 import com.example.trackr_mobile.util.SheetsAPI
-import java.lang.Exception
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
 
 
+
+@RequiresApi(Build.VERSION_CODES.N)
 @Composable
 fun HomeScreen(userEmail: String, displayName: String, context: Context) {
+    var applications = remember {
+        mutableStateListOf<Application>()
+    }
+    var sheetsAPI: SheetsAPI = SheetsAPI(context)
     TitleBar("TrackR")
-    DisplaySheets()
+    DisplaySheets(applications, sheetsAPI)
+
 
     Text(text = "Welcome $displayName! Your email is $userEmail", modifier = Modifier.offset(x = 20.dp, y = 600.dp))
-    Button(onClick = { sheetsAPI(context) }) {
-        Text(text = "Button")
+    Button(onClick = {
+        applications.clear()
+        var thread: Thread = Thread {
+            sheetsAPI(sheetsAPI)?.let { applications.addAll(it.get()) }
+        }
+        thread.start()
+    }) {
+        Text(text = "TrackR")
     }
 }
 
-fun sheetsAPI(context: Context) {
-
-    var sheet = SheetsAPI(context)
+@RequiresApi(Build.VERSION_CODES.N)
+fun sheetsAPI(sheetsAPI: SheetsAPI): Future<MutableList<Application>>? {
+    val es: ExecutorService = Executors.newFixedThreadPool(10)
+    var result: Future<MutableList<Application>>? = null
 
     try {
-        val thread: Thread = Thread({ sheet.run() });
-        thread.start();
+        var callable: () -> MutableList<Application> = {sheetsAPI.allEntries}
+        result = es.submit(callable)
     } catch (e: Exception) {
         e.printStackTrace();
     }
+    return result
 }
 
 
@@ -59,7 +79,7 @@ fun TitleBar(title: String) {
 }
 
 @Composable
-fun DisplaySheets() {
+fun DisplaySheets(applications: List<Application>?, sheetsAPI: SheetsAPI) {
     var expanded by remember { mutableStateOf(false) }
     // TODO: Will be replaced by backend Sheets API call to fetch the title of the sheet
     val sheets = listOf(
@@ -70,13 +90,6 @@ fun DisplaySheets() {
     )
     var selectedText by remember { mutableStateOf("") }
     var textFieldSize by remember { mutableStateOf(Size.Zero) }
-    val entries = mutableListOf<String>()
-    // Eventually use API call to populate list of entries for this selected sheet
-    entries.add("Meta")
-    entries.add("Google")
-    entries.add("Amazon")
-    entries.add("Cisco")
-    entries.add("Palantir")
 
     val arrowIcon = if (expanded) {
         Icons.Filled.KeyboardArrowDown
@@ -128,32 +141,37 @@ fun DisplaySheets() {
 
 
         // Status of selected sheet
-        println(entries)
-        DisplayStatus(entries)
+        DisplayStatus(applications, sheetsAPI)
     }
 }
 
 @Composable
-fun DisplayStatus(entries: MutableList<String>) {
+fun DisplayStatus(applications: List<Application>?, sheetsAPI: SheetsAPI) {
     Column {
-        for (entry in entries) {
-            CustomRadioGroup(company = entry)
+        if (applications != null) {
+            for (i in applications.indices) {
+                CustomRadioGroup(applications[i], i, sheetsAPI)
+            }
         }
     }
 }
 
 @Composable
-fun CustomRadioGroup(company: String) {
+fun CustomRadioGroup(application: Application, index: Int, sheetsAPI: SheetsAPI) {
     val options = listOf(
         "Applied",
         "Interviewing",
         "Offer",
         "Rejected"
     )
+    var company = application.company
     // GET request can populate this variable with what is actually in the sheet
-    var selectedOption by remember { mutableStateOf("Applied") }
+    var selectedOption by remember { mutableStateOf(application.status) }
     val onSelectedChange = { text: String ->
         selectedOption = text
+        var thread: Thread = Thread{ sheetsAPI.updateStatus(text, "E" + (index + 2)) }
+        thread.start()
+
     }
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(text = company, modifier = Modifier.padding(end = 3.dp))
