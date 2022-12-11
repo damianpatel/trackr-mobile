@@ -34,6 +34,7 @@ fun AuthScreen(viewModel: AuthViewModel = AuthViewModel(), navController: NavCon
             task ->
             try {
                 val account = task?.getResult(ApiException::class.java)
+                println(account)
                 if (account == null) {
                     text = "Sign in Failure"
                 } else {

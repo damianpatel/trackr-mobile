@@ -26,7 +26,6 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                 ) {
                     //AuthScreen()
-
                     val navController = rememberNavController()
 
                     NavHost(navController = navController, startDestination = Screen.LOGIN.route ) {
@@ -39,7 +38,7 @@ class MainActivity : ComponentActivity() {
 
 
                             if (email != null && displayName != null) {
-                                HomeScreen(email, displayName)
+                                HomeScreen(email, displayName, applicationContext)
                             }
                         }
                     }
