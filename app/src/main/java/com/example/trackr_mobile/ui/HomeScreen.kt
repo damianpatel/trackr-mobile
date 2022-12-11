@@ -1,5 +1,6 @@
 package com.example.trackr_mobile.ui
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -20,21 +21,40 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
-import com.example.trackr_mobile.model.User
+import com.example.trackr_mobile.util.SheetsAPI
+import java.lang.Exception
+
 
 @Composable
-fun HomeScreen(userEmail: String, displayName: String) {
+fun HomeScreen(userEmail: String, displayName: String, context: Context) {
     TitleBar("TrackR")
     DisplaySheets()
 
     Text(text = "Welcome $displayName! Your email is $userEmail", modifier = Modifier.offset(x = 20.dp, y = 600.dp))
+    Button(onClick = { sheetsAPI(context) }) {
+        Text(text = "Button")
+    }
 }
+
+fun sheetsAPI(context: Context) {
+
+    var sheet = SheetsAPI(context)
+
+    try {
+        val thread: Thread = Thread({ sheet.run() });
+        thread.start();
+    } catch (e: Exception) {
+        e.printStackTrace();
+    }
+}
+
 
 @Composable
 fun TitleBar(title: String) {
     TopAppBar(title = {
         Text(text = title, textAlign = TextAlign.Center)
     })
+
     Spacer(modifier = Modifier.padding(30.dp))
 }
 
@@ -69,7 +89,8 @@ fun DisplaySheets() {
     Column(Modifier.padding(20.dp)) {
 
         Box {
-            OutlinedTextField(value = selectedText, onValueChange = { selectedText = it },
+            OutlinedTextField(
+                value = selectedText, onValueChange = { selectedText = it },
                 modifier = Modifier
                     .padding(top = 40.dp)
                     .clickable { expanded = !expanded }
@@ -79,7 +100,10 @@ fun DisplaySheets() {
                     },
                 label = { Text("YouR Sheets") },
                 trailingIcon = {
-                    Icon(arrowIcon, "contentDescription", Modifier.clickable { expanded = !expanded })
+                    Icon(
+                        arrowIcon,
+                        "contentDescription",
+                        Modifier.clickable { expanded = !expanded })
                 },
                 enabled = false,
             )
