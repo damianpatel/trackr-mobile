@@ -36,17 +36,14 @@ public class SheetsAPI {
      * Global instance of the scopes required by this quickstart.
      * If modifying these scopes, delete your previously saved tokens/ folder.
      * @param context
-     * @param es
      */
 
     public SheetsAPI(Context context) {
         this.context = context;
-        SheetsRequestInitializer sheetsRequestInitializer = new SheetsRequestInitializer(apiKey);
         GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(context, Collections.singleton(SheetsScopes.SPREADSHEETS));
         credential.setSelectedAccount(credential.getAllAccounts()[0]);
         service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
                 .setApplicationName(APPLICATION_NAME)
-                .setGoogleClientRequestInitializer(sheetsRequestInitializer)
                 .build();
     }
 
@@ -58,8 +55,7 @@ public class SheetsAPI {
     @RequiresApi(api = Build.VERSION_CODES.N)
     public List<Application> getAllEntries() {
         // Build a new authorized API client service.
-        final String range = "A2:E600";
-        System.out.println("Hello");
+        final String range = "A2:E";
         ValueRange response = null;
         try {
             response = service.spreadsheets().values()
@@ -69,7 +65,6 @@ public class SheetsAPI {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Call made");
 
         List<List<Object>> values = response.getValues();
         List<Application> applications = new ArrayList<>();

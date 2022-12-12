@@ -17,12 +17,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.toSize
 import com.example.trackr_mobile.model.Application
 import com.example.trackr_mobile.util.SheetsAPI
 import java.util.concurrent.ExecutorService
@@ -38,20 +35,19 @@ fun HomeScreen(userEmail: String, displayName: String, context: Context) {
         mutableStateListOf<Application>()
     }
     var sheetsAPI: SheetsAPI = SheetsAPI(context)
-    TitleBar("TrackR")
-    DisplaySheets(applications, sheetsAPI)
-
-
-    Text(text = "Welcome $displayName! Your email is $userEmail", modifier = Modifier.offset(x = 20.dp, y = 600.dp))
-    Button(onClick = {
+    var onClick = fun  () {
         applications.clear()
         var thread: Thread = Thread {
             sheetsAPI(sheetsAPI)?.let { applications.addAll(it.get()) }
         }
         thread.start()
-    }) {
-        Text(text = "TrackR")
     }
+    DisplaySheets(applications, sheetsAPI, onClick)
+
+
+    Text(text = "Welcome $displayName! Your email is $userEmail", modifier = Modifier.offset(x = 20.dp, y = 600.dp))
+
+
 }
 
 @RequiresApi(Build.VERSION_CODES.N)
@@ -79,7 +75,7 @@ fun TitleBar(title: String) {
 }
 
 @Composable
-fun DisplaySheets(applications: List<Application>?, sheetsAPI: SheetsAPI) {
+fun DisplaySheets(applications: List<Application>?, sheetsAPI: SheetsAPI, onClick: () -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     // TODO: Will be replaced by backend Sheets API call to fetch the title of the sheet
     val sheets = listOf(
@@ -100,40 +96,42 @@ fun DisplaySheets(applications: List<Application>?, sheetsAPI: SheetsAPI) {
 
 
     Column(Modifier.padding(20.dp)) {
+        TitleBar("TrackR")
+
 
         Box {
-            OutlinedTextField(
-                value = selectedText, onValueChange = { selectedText = it },
-                modifier = Modifier
-                    .padding(top = 40.dp)
-                    .clickable { expanded = !expanded }
-                    .fillMaxWidth()
-                    .onGloballyPositioned { coordinates ->
-                        textFieldSize = coordinates.size.toSize()
-                    },
-                label = { Text("YouR Sheets") },
-                trailingIcon = {
-                    Icon(
-                        arrowIcon,
-                        "contentDescription",
-                        Modifier.clickable { expanded = !expanded })
-                },
-                enabled = false,
-            )
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier.width(with(LocalDensity.current) { textFieldSize.width.toDp() })
-            ) {
-                sheets.forEach { sheet ->
-                    DropdownMenuItem(onClick = {
-                        selectedText = sheet
-                        expanded = false
-                    }) {
-                        Text(text = sheet)
-                    }
-                }
-            }
+//            OutlinedTextField(
+//                value = selectedText, onValueChange = { selectedText = it },
+//                modifier = Modifier
+//                    .padding(top = 40.dp)
+//                    .clickable { expanded = !expanded }
+//                    .fillMaxWidth()
+//                    .onGloballyPositioned { coordinates ->
+//                        textFieldSize = coordinates.size.toSize()
+//                    },
+//                label = { Text("YouR Sheets") },
+//                trailingIcon = {
+//                    Icon(
+//                        arrowIcon,
+//                        "contentDescription",
+//                        Modifier.clickable { expanded = !expanded })
+//                },
+//                enabled = false,
+//            )
+//            DropdownMenu(
+//                expanded = expanded,
+//                onDismissRequest = { expanded = false },
+//                modifier = Modifier.width(with(LocalDensity.current) { textFieldSize.width.toDp() })
+//            ) {
+//                sheets.forEach { sheet ->
+//                    DropdownMenuItem(onClick = {
+//                        selectedText = sheet
+//                        expanded = false
+//                    }) {
+//                        Text(text = sheet)
+//                    }
+//                }
+//            }
 
 
         }
@@ -142,6 +140,9 @@ fun DisplaySheets(applications: List<Application>?, sheetsAPI: SheetsAPI) {
 
         // Status of selected sheet
         DisplayStatus(applications, sheetsAPI)
+        Button(onClick = onClick) {
+            Text(text = "TrackR")
+        }
     }
 }
 
