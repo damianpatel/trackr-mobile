@@ -9,10 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.trackr_mobile.ui.AuthPage
-import com.example.trackr_mobile.ui.AuthScreen
-import com.example.trackr_mobile.ui.HomeScreen
-import com.example.trackr_mobile.ui.Screen
+import com.example.trackr_mobile.ui.*
 import com.example.trackr_mobile.ui.theme.TrackrmobileTheme
 
 class MainActivity : ComponentActivity() {
