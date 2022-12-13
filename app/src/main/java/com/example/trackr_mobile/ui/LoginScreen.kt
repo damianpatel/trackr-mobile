@@ -1,9 +1,14 @@
 package com.example.trackr_mobile.ui
 
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.example.trackr_mobile.model.AuthViewModel
 import com.example.trackr_mobile.util.AuthResultContract
@@ -14,12 +19,15 @@ import kotlinx.coroutines.launch
 fun AuthPage(text: String = "", loadingText: String = "", onClick:() -> Unit) {
     var clicked by remember { mutableStateOf(false) }
 
+    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Button(onClick = {
+            clicked = !clicked
+            onClick()
+        }) {
+            Text(text = "Sign in with Google")
+        }
 
-    Button(onClick = {
-        clicked = !clicked
-        onClick()
-    }) {
-        Text(text = "Sign in with Google")
+        AdBanner(context = LocalContext.current)
     }
 }
 
