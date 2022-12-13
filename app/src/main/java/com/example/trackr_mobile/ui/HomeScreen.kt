@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,12 +43,10 @@ fun HomeScreen(userEmail: String, displayName: String, context: Context) {
         }
         thread.start()
     }
+
     DisplaySheets(applications, sheetsAPI, onClick)
 
-
     Text(text = "Welcome $displayName! Your email is $userEmail", modifier = Modifier.offset(x = 20.dp, y = 600.dp))
-
-
 }
 
 @RequiresApi(Build.VERSION_CODES.N)
