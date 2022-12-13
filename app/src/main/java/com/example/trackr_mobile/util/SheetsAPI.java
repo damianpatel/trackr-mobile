@@ -29,7 +29,7 @@ public class SheetsAPI {
     private final Context context;
     final String apiKey = "AIzaSyBPJmfyTPfRPGV566hxysCCkv3H8TscVJQ";
     final NetHttpTransport HTTP_TRANSPORT = new com.google.api.client.http.javanet.NetHttpTransport();
-    final String spreadsheetId = "1tHZnpezywsKwHmdCtDfXIBZ-Yn7MmliK4VI9_he9i7Q";
+    private final String spreadsheetId;
     private Sheets service;
 
     /**
@@ -38,8 +38,9 @@ public class SheetsAPI {
      * @param context
      */
 
-    public SheetsAPI(Context context) {
+    public SheetsAPI(Context context, String spreadsheetId) {
         this.context = context;
+        this.spreadsheetId = spreadsheetId;
         GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(context, Collections.singleton(SheetsScopes.SPREADSHEETS));
         credential.setSelectedAccount(credential.getAllAccounts()[0]);
         service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)

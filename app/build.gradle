@@ -75,6 +75,7 @@ dependencies {
         exclude group: 'org.apache.httpcomponents'
         exclude module: 'guava-jdk5'
     }
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     implementation 'com.google.code.gson:gson:2.10'
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
     implementation 'com.google.http-client:google-http-client-gson:1.19.0'
