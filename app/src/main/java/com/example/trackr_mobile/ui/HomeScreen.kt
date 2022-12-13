@@ -7,25 +7,26 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.trackr_mobile.model.Application
+import com.example.trackr_mobile.util.Item
 import com.example.trackr_mobile.util.SheetsAPI
+import com.example.trackr_mobile.util.callAPI
+import com.google.gson.Gson
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
-
 
 
 @RequiresApi(Build.VERSION_CODES.N)
@@ -34,21 +35,38 @@ fun HomeScreen(userEmail: String, displayName: String, context: Context) {
     var applications = remember {
         mutableStateListOf<Application>()
     }
-    var sheetsAPI: SheetsAPI = SheetsAPI(context)
+
+    var loading by remember {
+        mutableStateOf(false)
+    }
+    var spreadsheetId by remember {
+        mutableStateOf("")
+    }
+
+
+    var sheetsAPI = SheetsAPI(context, spreadsheetId)
     var onClick = fun  () {
         applications.clear()
         var thread: Thread = Thread {
+            loading = true
+            var result = callAPI(userEmail).get()
+            val gson = Gson()
+            spreadsheetId = gson.fromJson(result?.body()?.string(), Item::class.java).sheetId
+            sheetsAPI = SheetsAPI(context, spreadsheetId)
             sheetsAPI(sheetsAPI)?.let { applications.addAll(it.get()) }
+            loading = false
         }
         thread.start()
     }
-    DisplaySheets(applications, sheetsAPI, onClick)
+    DisplaySheets(applications, sheetsAPI, onClick, loading)
 
 
     Text(text = "Welcome $displayName! Your email is $userEmail", modifier = Modifier.offset(x = 20.dp, y = 600.dp))
 
 
 }
+
+
 
 @RequiresApi(Build.VERSION_CODES.N)
 fun sheetsAPI(sheetsAPI: SheetsAPI): Future<MutableList<Application>>? {
@@ -70,85 +88,28 @@ fun TitleBar(title: String) {
     TopAppBar(title = {
         Text(text = title, textAlign = TextAlign.Center)
     })
-
-    Spacer(modifier = Modifier.padding(30.dp))
 }
 
 @Composable
-fun DisplaySheets(applications: List<Application>?, sheetsAPI: SheetsAPI, onClick: () -> Unit) {
-    var expanded by remember { mutableStateOf(false) }
-    // TODO: Will be replaced by backend Sheets API call to fetch the title of the sheet
-    val sheets = listOf(
-        "Fall Internships",
-        "Summer Internships",
-        "Winter Internships",
-        "Full-time Jobs"
-    )
-    var selectedText by remember { mutableStateOf("") }
-    var textFieldSize by remember { mutableStateOf(Size.Zero) }
-
-    val arrowIcon = if (expanded) {
-        Icons.Filled.KeyboardArrowDown
-    } else {
-        Icons.Filled.ArrowDropDown
-    }
-
-
-
-    Column(Modifier.padding(20.dp)) {
+fun DisplaySheets(applications: List<Application>?, sheetsAPI: SheetsAPI, onClick: () -> Unit, loading: Boolean) {
+    Column {
         TitleBar("TrackR")
-
-
-        Box {
-//            OutlinedTextField(
-//                value = selectedText, onValueChange = { selectedText = it },
-//                modifier = Modifier
-//                    .padding(top = 40.dp)
-//                    .clickable { expanded = !expanded }
-//                    .fillMaxWidth()
-//                    .onGloballyPositioned { coordinates ->
-//                        textFieldSize = coordinates.size.toSize()
-//                    },
-//                label = { Text("YouR Sheets") },
-//                trailingIcon = {
-//                    Icon(
-//                        arrowIcon,
-//                        "contentDescription",
-//                        Modifier.clickable { expanded = !expanded })
-//                },
-//                enabled = false,
-//            )
-//            DropdownMenu(
-//                expanded = expanded,
-//                onDismissRequest = { expanded = false },
-//                modifier = Modifier.width(with(LocalDensity.current) { textFieldSize.width.toDp() })
-//            ) {
-//                sheets.forEach { sheet ->
-//                    DropdownMenuItem(onClick = {
-//                        selectedText = sheet
-//                        expanded = false
-//                    }) {
-//                        Text(text = sheet)
-//                    }
-//                }
-//            }
-
-
-        }
-
-
-
         // Status of selected sheet
-        DisplayStatus(applications, sheetsAPI)
-        Button(onClick = onClick) {
-            Text(text = "TrackR")
+        if (loading) {
+            Text(text = "Loading...")
+
+        } else {
+            DisplayStatus(applications, sheetsAPI)
+            Button(onClick = onClick, Modifier.padding(20.dp, 0.dp)) {
+                Text(text = "TrackR")
+            }
         }
     }
 }
 
 @Composable
 fun DisplayStatus(applications: List<Application>?, sheetsAPI: SheetsAPI) {
-    Column {
+    Column(Modifier.padding(20.dp, 0.dp)) {
         if (applications != null) {
             for (i in applications.indices) {
                 CustomRadioGroup(applications[i], i, sheetsAPI)
